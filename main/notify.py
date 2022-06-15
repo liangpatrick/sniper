@@ -5,8 +5,13 @@ import requests
 import dbMethods
 
 
-db = connect.connect()
+db = dbMethods.connect()
 mycursor = db.cursor()
 
 def push(row):
-    print("hello")
+    # sends message
+    try:
+        print("hello")
+        dbMethods.delCode(db, row[2])
+    except Exception as err:
+        print("Exception raised:", err)

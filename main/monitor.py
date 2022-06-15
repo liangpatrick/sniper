@@ -1,5 +1,6 @@
 import os
 import datetime
+import re
 # installed
 import json
 import requests
@@ -26,12 +27,16 @@ termKey= {
 # updates sql DB and front end will always push the netid
 def updateDB(netid, code):
   # ADD FILTER FOR INPUTS
+  filtered = re.sub(r'[^a-zA-Z0-9]', '', netid)
 
-  dbMethods.addUser(db, netid)
-  dbMethods.addCode(db, code, netid)
+  dbMethods.addUser(db, filtered)
+  dbMethods.addCode(db, code, filtered)
+  dbMethods.showCodes(db)
+  dbMethods.delCode(db, code)
+  dbMethods.showCodes(db)
   print("DONE")
 
-
+updateDB("pzl4", 12345)
 # setting up threads to monitor each separate term
 def createThreads():
   day = datetime.datetime.now().day
@@ -69,20 +74,31 @@ def createThreads():
 # will simply monitor when it is time to send a notification, in which it will alert another file to do so
 def monitorThread(term, endMonth, URL):
   var = False
-  # attempt to connect to the endpoint
-  while not(var):
-    i
-    try:
-        res = requests.get(URL)
-        var = True
-        print("Connected")
-    except:
-        print("Failed to connect")
-
-  # creates a json object which is effectively a dictionary in python
-  openSections = res.json()
-
+  # infinite loop until the registration period ends
   while True:
+    if(datetime.datetime.now().month == endMonth):
+      return
+    # checks to see how long it will sleep until monitoring again
+    hour = datetime.datetime.now().hour
+    if hour < 7 or hour > 22:
+      min = datetime.datetime.now().minute
+      difference = 60 - crntMin
+      converted = difference * 60000
+      print("Hours is " + hour)
+      print("Sleeping ... waiting " + difference + " minutes")
+      sleep(converted)
+    # attempt to connect to the endpoint
+    while not(var):
+      try:
+          res = requests.get(URL)
+          var = True
+          print("Connected")
+      except:
+          print("Failed to connect")
+
+    # creates a json object which is effectively a dictionary in python
+    openSections = res.json()
+
     mycursor.execute("SELECT * FROM Codes")
     course_codes = mycursor.fetchall()
     # iterates through each row in the TABLE Codes
@@ -91,6 +107,9 @@ def monitorThread(term, endMonth, URL):
         continue
       # sends the row tuple which is: (id, uid, codes)
       notify.push(row)
+
+  # will cause thread to end
+  return
 
     
 
