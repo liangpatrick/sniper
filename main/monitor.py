@@ -4,7 +4,7 @@ import re
 # installed
 import json
 import requests
-from threading import Thread, Lock
+import threading
 # own files
 import dbMethods
 import notify
@@ -31,20 +31,30 @@ def updateDB(netid, code):
 
   dbMethods.addUser(db, filtered)
   dbMethods.addCode(db, code, filtered)
-  dbMethods.showCodes(db)
-  dbMethods.delCode(db, code)
-  dbMethods.showCodes(db)
+  # dbMethods.showCodes(db)
+  # dbMethods.delCode(db, code)
+  # dbMethods.showCodes(db)
   print("DONE")
 
-updateDB("pzl4", 12345)
+# updateDB("pzl4", 12345)
 # setting up threads to monitor each separate term
 def createThreads():
   day = datetime.datetime.now().day
+  print(day)
   month = datetime.datetime.now().month
+  print(month)
   year = datetime.datetime.now().year
+  print(year)
   # checks the first of every month if a thread should be created
+  count = 0
   while True:
-    if day == 1:
+    # only happens once a month and at 6 am
+    hour = datetime.datetime.now().hour
+    if day != 1 and hour == 6:
+      count = 0
+      continue
+    if day == 1 and count == 0:
+      count += 1
       if month == 3:
         term = termKey["summer"]
         finalURL = f'{baseURL}{year}&term={term}&campus=NB'
@@ -73,14 +83,15 @@ def createThreads():
 
 # will simply monitor when it is time to send a notification, in which it will alert another file to do so
 def monitorThread(term, endMonth, URL):
-  var = False
+  print(term + " thread has been opened")
   # infinite loop until the registration period ends
   while True:
+    var = False
     if(datetime.datetime.now().month == endMonth):
-      return
+      break
     # checks to see how long it will sleep until monitoring again
     hour = datetime.datetime.now().hour
-    if hour < 7 or hour > 22:
+    if hour < 6 or hour > 23:
       min = datetime.datetime.now().minute
       difference = 60 - crntMin
       converted = difference * 60000
@@ -109,10 +120,10 @@ def monitorThread(term, endMonth, URL):
       notify.push(row)
 
   # will cause thread to end
+  print(term + " thread has been closed")
   return
 
     
-
 
 
       
