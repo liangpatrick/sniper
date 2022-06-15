@@ -39,15 +39,14 @@ def updateDB(netid, code):
 # updateDB("pzl4", 12345)
 # setting up threads to monitor each separate term
 def createThreads():
-  day = datetime.datetime.now().day
-  print(day)
-  month = datetime.datetime.now().month
-  print(month)
-  year = datetime.datetime.now().year
-  print(year)
-  # checks the first of every month if a thread should be created
   count = 0
   while True:
+    day = datetime.datetime.now().day
+    print(day)
+    month = datetime.datetime.now().month
+    print(month)
+    year = datetime.datetime.now().year
+    print(year)
     # only happens once a month and at 6 am
     hour = datetime.datetime.now().hour
     if day != 1 and hour == 6:
@@ -123,7 +122,7 @@ def monitorThread(term, endMonth, URL):
   print(term + " thread has been closed")
   return
 
-    
+createThreads()
 
 
       
