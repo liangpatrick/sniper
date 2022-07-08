@@ -1,25 +1,20 @@
-import mysql.connector
-from mysql.connector import errorcode
+import psycopg2 
+import sys
+mycursor = db.cursor()
 
 def connect():
   var = False
   while not(var):
     try:
-        db = mysql.connector.connect(
-        user='root',
-        password = 'TO_BE_REPLACED_WITH_REAL_PASSWORD',
-        database='course_codes'
-        )
-        print("Connected to MySQL DB")
-        var = True
-    except mysql.connector.Error as err:
-      if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-        print("Something is wrong with your user name or password")
-        return
-      elif err.errno == errorcode.ER_BAD_DB_ERROR:
-        print("Database does not exist")
-        return
-      else:
+      db = psycopg2.connect(
+          host="localhost",
+          user='liangpatrick',
+          password = 'NOT_THE_PASSWORD_',
+          database='course_codes'
+      )
+      print("Connected to PostgreSQL DB")
+      var = True
+    except psycopg2.OperationalError as err:
         print(err)
 
   return db
@@ -30,10 +25,8 @@ def addUser(db, netid):
       mycursor.execute("INSERT INTO Users (netid) VALUES (%s)", (netid,))
       db.commit()
       print("Successfully added user " + netid)
-      var = True
-  except mysql.connector.IntegrityError as err:
-      if err.errno == 1062:
-          print("DUPLICATE USER, ALREADY EXISTS")
+  except psycopg2.errors.UniqueViolation as err:
+    print("DUPLICATE USER, ALREADY EXISTS")
 
 def addCode(db, code, netid):
   try:
@@ -54,13 +47,12 @@ def addCode(db, code, netid):
           print("CODE ALREADY ADDED")
 
 def delCode(db, code):
-  # Don't have to use try catch here because no errors are thrown when deleting a non empty thing
+  # Don't have to use try catch here because no errors are thrown when deleting a non existing thing
   mycursor = db.cursor()
   Q = "DELETE FROM Codes WHERE codes = %s"
   dele = (code,)
   mycursor.execute(Q, dele)
   db.commit()
-
   print("Successfully removed " + str(dele[0]))
   var = True
   

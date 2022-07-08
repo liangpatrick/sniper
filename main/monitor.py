@@ -11,7 +11,8 @@ import notify
 
 baseURL = "http://sis.rutgers.edu/soc/api/openSections.json?year="
 # rest of the URL template: {year}&term={term}&campus=NB
-
+courseURL = "https://sis.rutgers.edu/soc/api/courses.json?year="
+# rest of the URL template: {year}&term={term}&campus=NB
 # connect to sql database
 db = dbMethods.connect()
 mycursor = db.cursor()
@@ -28,6 +29,11 @@ termKey= {
 def updateDB(netid, code):
   # ADD FILTER FOR INPUTS
   filtered = re.sub(r'[^a-zA-Z0-9]', '', netid)
+  courseDict = allSections(getCourses())
+
+  if code not in courseDict:
+    print("NON-VALID CODE, PLEASE TRY AGAIN")
+    return
 
   dbMethods.addUser(db, filtered)
   dbMethods.addCode(db, code, filtered)
@@ -36,7 +42,47 @@ def updateDB(netid, code):
   # dbMethods.showCodes(db)
   print("DONE")
 
-# updateDB("pzl4", 12345)
+# gets all sections
+def allSections(json):
+  secDict = {}
+  for x in json:
+    for y in x["sections"]:
+      index = y["index"]
+      secDict[index] = True
+  return secDict
+
+# gets the courses
+def getCourses():
+  month = datetime.datetime.now().month
+  print(month)
+  year = datetime.datetime.now().year
+  print(year)
+  term = ""
+  # determines season
+  if month > 3 and month < 10:
+    term = termKey["fall"]
+  elif month > 10:
+    term = termKey["spring"]
+    ++year
+  elif month < 4:
+    term = termKey["spring"]
+  elif month == 3:
+    term = termKey["summer"]
+  var = False
+  finalURL = f'{courseURL}{year}&term={term}&campus=NB'
+  print(finalURL)
+  while not(var):
+      try:
+          res = requests.get(finalURL)
+          var = True
+          print("Connected")
+      except:
+          print("Failed to connect")
+  return res.json()
+
+
+updateDB("pzl4", "05386")
+  
 # setting up threads to monitor each separate term
 def createThreads():
   count = 0
@@ -122,7 +168,7 @@ def monitorThread(term, endMonth, URL):
   print(term + " thread has been closed")
   return
 
-createThreads()
+# createThreads()
 
 
       
