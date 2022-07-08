@@ -42,9 +42,8 @@ def addCode(db, code, netid):
   
       print("Successfully added " + str(pair[0]) + " " + pair[1])
       var = True
-  except mysql.connector.IntegrityError as err:
-      if err.errno == 1062:
-          print("CODE ALREADY ADDED")
+  except psycopg2.errors.UniqueViolation as err:
+    print("cODE ALREADY ADDED")
 
 def delCode(db, code):
   # Don't have to use try catch here because no errors are thrown when deleting a non existing thing
