@@ -6,7 +6,8 @@ def connect():
   var = False
   while not(var):
     try:
-      DATABASE_URL = 'postgres://aezoqicdyvmfpv:9e122cf1d32771e5cb83111839a4136759aeff644d817c7a2d39c4f359a0f302@ec2-52-20-166-21.compute-1.amazonaws.com:5432/d1sonj4hukngri'
+      DATABASE_URL = ''
+      
       db = psycopg2.connect(DATABASE_URL, sslmode='require')
       print("Connected to PostgreSQL DB")
       var = True
