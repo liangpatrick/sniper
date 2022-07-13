@@ -1,17 +1,13 @@
 import psycopg2 
 import sys
-mycursor = db.cursor()
+# mycursor = db.cursor()
 
 def connect():
   var = False
   while not(var):
     try:
-      db = psycopg2.connect(
-          host="localhost",
-          user='liangpatrick',
-          password = 'NOT_THE_PASSWORD_',
-          database='course_codes'
-      )
+      DATABASE_URL = 'postgres://aezoqicdyvmfpv:9e122cf1d32771e5cb83111839a4136759aeff644d817c7a2d39c4f359a0f302@ec2-52-20-166-21.compute-1.amazonaws.com:5432/d1sonj4hukngri'
+      db = psycopg2.connect(DATABASE_URL, sslmode='require')
       print("Connected to PostgreSQL DB")
       var = True
     except psycopg2.OperationalError as err:
@@ -31,19 +27,18 @@ def addUser(db, netid):
 def addCode(db, code, netid):
   try:
       mycursor = db.cursor()
-      Q =  "INSERT INTO Codes\
-            SET codes = %s,\
-            uid = (SELECT uid\
-            FROM Users\
-            WHERE netid = %s)"
-      pair = (code, netid)
+      mycursor.execute("SELECT uid FROM Users WHERE netid = %s", (netid,))
+      uid = mycursor.fetchall()
+      Q =  "INSERT INTO Codes (codes, uid)\
+            VALUES (%s,%s)"
+      pair = (code, (uid[0],))
       mycursor.execute(Q, pair)
       db.commit()
   
-      print("Successfully added " + str(pair[0]) + " " + pair[1])
+      print("Successfully added " + str(pair[0]) + " " + netid)
       var = True
   except psycopg2.errors.UniqueViolation as err:
-    print("cODE ALREADY ADDED")
+    print("CODE ALREADY ADDED")
 
 def delCode(db, code):
   # Don't have to use try catch here because no errors are thrown when deleting a non existing thing

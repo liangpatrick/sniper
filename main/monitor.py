@@ -30,11 +30,12 @@ def updateDB(netid, code):
   # ADD FILTER FOR INPUTS
   filtered = re.sub(r'[^a-zA-Z0-9]', '', netid)
   courseDict = allSections(getCourses())
-
+  print(filtered)
   if code not in courseDict:
     print("NON-VALID CODE, PLEASE TRY AGAIN")
     return
-
+  mycursor = db.cursor()
+  mycursor.execute("ROLLBACK")
   dbMethods.addUser(db, filtered)
   dbMethods.addCode(db, code, filtered)
   # dbMethods.showCodes(db)
@@ -172,5 +173,3 @@ def monitorThread(term, endMonth, URL):
 
 
       
-  
-# dbMethods.showCodes(db)
