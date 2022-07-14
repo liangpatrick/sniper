@@ -82,7 +82,7 @@ def getCourses():
   return res.json()
 
 
-updateDB("pzl4", "05386")
+# updateDB("pzl4", "05386")
   
 # setting up threads to monitor each separate term
 def createThreads():
@@ -169,7 +169,7 @@ def monitorThread(term, endMonth, URL):
   print(term + " thread has been closed")
   return
 
-# createThreads()
+createThreads()
 
 
       

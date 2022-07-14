@@ -1,5 +1,6 @@
 import psycopg2 
 import sys
+import os
 # mycursor = db.cursor()
 
 def connect():
