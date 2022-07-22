@@ -29,9 +29,10 @@ termKey= {
 def updateDB(netid, code):
   # ADD FILTER FOR INPUTS
   filtered = re.sub(r'[^a-zA-Z0-9]', '', netid)
-  courseDict = allSections(getCourses())
+  courseDict = getCourseInfo(getCourses())
+  print(courseDict['17471'])
   print(filtered)
-  if code not in courseDict:
+  if str(code) not in courseDict:
     print("NON-VALID CODE, PLEASE TRY AGAIN")
     return
   mycursor = db.cursor()
@@ -39,18 +40,26 @@ def updateDB(netid, code):
   dbMethods.addUser(db, filtered)
   dbMethods.addCode(db, code, filtered)
   # dbMethods.showCodes(db)
-  # dbMethods.delCode(db, code)
+  # dbMethods.delCode(db, "05386")
   # dbMethods.showCodes(db)
   print("DONE")
 
-# gets all sections
-def allSections(json):
-  secDict = {}
-  for x in json:
-    for y in x["sections"]:
-      index = y["index"]
-      secDict[index] = True
-  return secDict
+def getCourseInfo(courses):
+
+  map = {}
+
+  # Going through the courses in the subject
+  for course in courses:
+  
+    sections = course['sections']
+    title = course['title']
+    # going through the sections in the course
+    for section in sections:
+      index = section['index']
+      map[index] = title      
+
+
+  return map
 
 # gets the courses
 def getCourses():
@@ -71,6 +80,14 @@ def getCourses():
     term = termKey["summer"]
   var = False
   finalURL = f'{courseURL}{year}&term={term}&campus=NB'
+
+# # temp
+#   year = datetime.datetime.now().year
+#   # print(year)
+#   term = termKey["fall"]
+#   finalURL = f'{courseURL}{year}&term={term}&campus=NB'
+
+
   print(finalURL)
   while not(var):
       try:
@@ -82,18 +99,18 @@ def getCourses():
   return res.json()
 
 
-# updateDB("pzl4", "05386")
+# updateDB("pzl4", "17471")
   
 # setting up threads to monitor each separate term
 def createThreads():
   count = 0
   while True:
     day = datetime.datetime.now().day
-    print(day)
+    # print(day)
     month = datetime.datetime.now().month
-    print(month)
+    # print(month)
     year = datetime.datetime.now().year
-    print(year)
+    # print(year)
     # only happens once a month and at 6 am
     hour = datetime.datetime.now().hour
     if day != 1 and hour == 6:
@@ -127,14 +144,23 @@ def createThreads():
         spring.start()
  
 
+# def testThread():
+#   year = datetime.datetime.now().year
+#   # print(year)
+#   # only happens once a month and at 6 am
+#   term = termKey["fall"]
+#   finalURL = f'{baseURL}{year}&term={term}&campus=NB'
+#   print(finalURL)
+#   fall = threading.Thread(target = monitorThread, args = ("9", 17, finalURL))
+#   fall.start()
+
 # will simply monitor when it is time to send a notification, in which it will alert another file to do so
 def monitorThread(term, endMonth, URL):
   print(term + " thread has been opened")
   # infinite loop until the registration period ends
   while True:
     var = False
-    if(datetime.datetime.now().month == endMonth):
-      break
+    
     # checks to see how long it will sleep until monitoring again
     hour = datetime.datetime.now().hour
     if hour < 6 or hour > 23:
@@ -149,27 +175,40 @@ def monitorThread(term, endMonth, URL):
       try:
           res = requests.get(URL)
           var = True
-          print("Connected")
+          # print("Connected")
       except:
           print("Failed to connect")
 
     # creates a json object which is effectively a dictionary in python
     openSections = res.json()
-
+    
     mycursor.execute("SELECT * FROM Codes")
     course_codes = mycursor.fetchall()
     # iterates through each row in the TABLE Codes
     for row in course_codes:
-      if row[2] not in openSections:
+      if str(row[2]) not in openSections:
         continue
       # sends the row tuple which is: (id, uid, codes)
-      notify.push(row)
-
+      uid = row[1]
+      mycursor.execute("SELECT netid FROM Users WHERE uid = %s", (uid,))
+      netid = mycursor.fetchall()
+      filtered = re.sub(r'[^a-zA-Z0-9]', '', str(netid[0]))
+      id = row[0]
+      codes = str(row[2])
+      map = getCourseInfo(getCourses())
+      courseName = map[codes]
+      notify.push(id, filtered, courseName, codes)
+      if(datetime.datetime.now().month == endMonth):
+        break
   # will cause thread to end
   print(term + " thread has been closed")
   return
 
 createThreads()
+
+# testThread()
+
+
 
 
       
