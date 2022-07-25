@@ -1,1 +1,1 @@
-worker: python main/womonitor.py
+worker: python main/monitor.py
