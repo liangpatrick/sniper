@@ -212,11 +212,11 @@ def monitorThread(term, endMonth, URL):
   print(term + " thread has been closed")
   return
 
-# createThreads()
-count = 0
-if count is 0:
-  notify.push(1, "pzl4", "haha", 17471)
-  count += 1
+createThreads()
+# count = 0
+# if count is 0:
+#   notify.push(1, "pzl4", "haha", 17471)
+#   count += 1
 # testThread()
 
 
