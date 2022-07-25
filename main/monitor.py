@@ -2,12 +2,16 @@ import os
 import datetime
 import re
 # installed
+from flask import Flask, jsonify, request
 import json
 import requests
 import threading
 # own files
 import dbMethods
 import notify
+
+# Create Flask object
+app = Flask(__name__)
 
 baseURL = "http://sis.rutgers.edu/soc/api/openSections.json?year="
 # rest of the URL template: {year}&term={term}&campus=NB
@@ -25,16 +29,22 @@ termKey= {
   'spring': 1 
 }
 
+
 # updates sql DB and front end will always push the netid
-def updateDB(netid, code):
+# Endpoint that will only accept POST requests
+@app.route("/addCode", methods=['POST'])
+def updateDB():
+  params = request.get_json()
+  netid = params["netid"]
+  codes = params["codes"]
+  if not(codes.isnumeric()):
+    return "Non valid entry"
   # ADD FILTER FOR INPUTS
   filtered = re.sub(r'[^a-zA-Z0-9]', '', netid)
   courseDict = getCourseInfo(getCourses())
-  print(courseDict['17471'])
   print(filtered)
   if str(code) not in courseDict:
-    print("NON-VALID CODE, PLEASE TRY AGAIN")
-    return
+    return "NON-VALID CODE, PLEASE TRY AGAIN"
   mycursor = db.cursor()
   mycursor.execute("ROLLBACK")
   dbMethods.addUser(db, filtered)
@@ -42,7 +52,8 @@ def updateDB(netid, code):
   # dbMethods.showCodes(db)
   # dbMethods.delCode(db, "05386")
   # dbMethods.showCodes(db)
-  print("DONE")
+  print("Success")
+  return "Success"
 
 def getCourseInfo(courses):
 
@@ -80,14 +91,6 @@ def getCourses():
     term = termKey["summer"]
   var = False
   finalURL = f'{courseURL}{year}&term={term}&campus=NB'
-
-# # temp
-#   year = datetime.datetime.now().year
-#   # print(year)
-#   term = termKey["fall"]
-#   finalURL = f'{courseURL}{year}&term={term}&campus=NB'
-
-
   print(finalURL)
   while not(var):
       try:
@@ -97,6 +100,11 @@ def getCourses():
       except:
           print("Failed to connect")
   return res.json()
+# # temp
+#   year = datetime.datetime.now().year
+#   # print(year)
+#   term = termKey["fall"]
+#   finalURL = f'{courseURL}{year}&term={term}&campus=NB'
 
 
 # updateDB("pzl4", "17471")
@@ -204,8 +212,8 @@ def monitorThread(term, endMonth, URL):
   print(term + " thread has been closed")
   return
 
-createThreads()
-
+# createThreads()
+notify.push(1, "pzl4", "haha", 17471)
 # testThread()
 
 

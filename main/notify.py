@@ -115,5 +115,3 @@ def push(id, netid, courseName, codes):
     except Exception as e:
         print(e.message)
     dbMethods.delCode(db, codes)
-
-# push(1, 'pzl4', '05386')
