@@ -8,24 +8,6 @@ import requests
 # own files
 import dbMethods
 
-# message = Mail(
-#     from_email='sniperuapp@gmail.com',
-#     to_emails='liangpatrick1234@gmail.com',
-#     subject='Sending with Twilio SendGrid is Fun',
-#     html_content='<strong>and easy to do anywhere, even with Python</strong>')
-
-# try:
-#     sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-#     response = sg.send(message)
-#     print(response.status_code)
-#     print(response.body)
-#     print(response.headers)
-# except Exception as e:
-#     print(e.message)
-
-
-
-
 baseURL = "http://sims.rutgers.edu/webreg/editSchedule.htm?login=cas&semesterSelection="
 # 92021&indexList=14006
 db = dbMethods.connect()
