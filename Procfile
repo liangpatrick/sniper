@@ -1,1 +1,2 @@
-web: gunicorn main/monitor:application
+worker: python main/monitor.py
+web: python main/updateDB.py
