@@ -213,7 +213,10 @@ def monitorThread(term, endMonth, URL):
   return
 
 # createThreads()
-notify.push(1, "pzl4", "haha", 17471)
+count = 0
+if count is 0:
+  notify.push(1, "pzl4", "haha", 17471)
+  count += 1
 # testThread()
 
 
