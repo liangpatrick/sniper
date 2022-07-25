@@ -1,1 +1,1 @@
-web python main/monitor.py
+worker: python main/womonitor.py
