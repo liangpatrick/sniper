@@ -1,7 +1,6 @@
 import psycopg2 
 import sys
 import os
-# mycursor = db.cursor()
 
 def connect():
   var = False
@@ -18,12 +17,27 @@ def connect():
 
 def addUser(db, netid):
   try:
-      mycursor = db.cursor()
-      mycursor.execute("INSERT INTO Users (netid) VALUES (%s)", (netid,))
-      db.commit()
-      print("Successfully added user " + netid)
+    mycursor = db.cursor()
+    mycursor.execute("INSERT INTO Users (netid) VALUES (%s)", (netid,))
+    db.commit()
+    print("Successfully added user " + netid)
+    return "Successfully added user " + netid
   except psycopg2.errors.UniqueViolation as err:
     print("DUPLICATE USER, ALREADY EXISTS")
+    return "User already added."
+
+def addEmail(db, netid, email):
+  try:
+    mycursor = db.cursor()
+    mycursor.execute("UPDATE Users SET email = %s WHERE netid = %s", (email, netid))
+    db.commit()
+    print("Successfully added " + email + " for " + netid)
+    return("Successfully added " + email + " for " + netid)
+  except psycopg2.errors.CheckViolation as err:
+    print(err)
+    return "Invalid email address, please try again."
+
+  
 
 def addCode(db, code, netid):
   try:

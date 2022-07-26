@@ -6,6 +6,7 @@ from flask import Flask, jsonify, request
 import json
 import requests
 import threading
+import names
 # own files
 import dbMethods
 
@@ -28,7 +29,7 @@ termKey= {
   'spring': 1 
 }
 
-
+# wrapper method for dbMethods
 # updates sql DB and front end will always push the netid
 # Endpoint that will only accept POST requests
 @app.route("/addCode", methods=['POST'])
@@ -36,6 +37,8 @@ def updateDB():
   params = request.get_json()
   netid = params["netid"]
   codes = params["codes"]
+  if netid is None:
+    netid = names.get_first_name()
   print(netid)
   print(codes)
   if not(codes.isnumeric()):
@@ -55,6 +58,13 @@ def updateDB():
   # dbMethods.showCodes(db)
   print("Success")
   return "Success"
+
+@app.route("/addEmail", methods=['POST'])
+def updateDB():
+  params = request.get_json()
+  netid = params["netid"]
+  email = params["email"]
+  return dbMethods.addEmail(db, netid, email)
 
 def getCourseInfo(courses):
 
