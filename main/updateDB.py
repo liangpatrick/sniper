@@ -60,7 +60,7 @@ def updateDB():
   return "Success"
 
 @app.route("/addEmail", methods=['POST'])
-def updateDB():
+def addEmail():
   params = request.get_json()
   netid = params["netid"]
   email = params["email"]
