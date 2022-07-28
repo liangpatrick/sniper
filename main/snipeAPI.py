@@ -89,73 +89,73 @@ def addEmail():
   return dbMethods.addEmail(db, netid, email)
 
 
-@app.route("/stream", methods=['GET'])
-def stream():
-    print("push notif start", flush=True)
-    def eventStream():
-        count = 0
-        while True:
-            # Poll data from the database
-            # and see if there's a new message
-            today = datetime.date.today()
-            count+=1
-            yield f"event: notifications\ndata:{today}, {count}\n\n"
-            time.sleep(1)
-    
-    return Response(eventStream(), mimetype='text/event-stream')
-
 # @app.route("/stream", methods=['GET'])
 # def stream():
 #     print("push notif start", flush=True)
-#     def monitorThread(term, endMonth, URL):
-#       print(term + " thread has been opened")
-#       # infinite loop until the registration period ends
-#       while True:
-#         var = False
-        
-#         # checks to see how long it will sleep until monitoring again
-#         hour = datetime.datetime.now().hour
-#         if hour < 6 or hour > 23:
-#           min = datetime.datetime.now().minute
-#           difference = 60 - crntMin
-#           converted = difference * 60000
-#           print("Hours is " + hour)
-#           print("Sleeping ... waiting " + difference + " minutes")
-#           sleep(converted)
-#         # attempt to connect to the endpoint
-#         while not(var):
-#           try:
-#               res = requests.get(URL)
-#               var = True
-#               # print("Connected")
-#           except:
-#               print("Failed to connect")
-
-#         # creates a json object which is effectively a dictionary in python
-#         openSections = res.json()
-        
-#         mycursor.execute("SELECT * FROM Codes")
-#         course_codes = mycursor.fetchall()
-#         # iterates through each row in the TABLE Codes
-#         for row in course_codes:
-#           if str(row[2]) not in openSections:
-#             continue
-#           # sends the row tuple which is: (id, uid, codes)
-#           uid = row[1]
-#           mycursor.execute("SELECT netid FROM Users WHERE uid = %s", (uid,))
-#           netid = mycursor.fetchone()
-#           id = row[0]
-#           codes = str(row[2])
-#           map = updateDB.getCourseInfo(updateDB.getCourses())
-#           courseName = map[codes]
-#           yield f'SnipeRU: {netid}! {courseName}({codes}) opened!\n\n'
-#           # notify.push(id, netid[0], courseName, codes)
-#           if(datetime.datetime.now().month == endMonth):
-#             break
-#       # will cause thread to end
-#       print(term + " thread has been closed")
+#     def eventStream():
+#         count = 0
+#         while True:
+#             # Poll data from the database
+#             # and see if there's a new message
+#             today = datetime.date.today()
+#             count+=1
+#             yield f"event: notifications\ndata:{today}, {count}\n\n"
+#             time.sleep(1)
     
-#     return Response(monitorThread("9", 17, finalURL), mimetype='text/event-stream')
+#     return Response(eventStream(), mimetype='text/event-stream')
+
+@app.route("/stream", methods=['GET'])
+def stream():
+    print("push notif start", flush=True)
+    def monitorThread(term, endMonth, URL):
+      print(term + " thread has been opened")
+      # infinite loop until the registration period ends
+      while True:
+        var = False
+        
+        # checks to see how long it will sleep until monitoring again
+        hour = datetime.datetime.now().hour
+        if hour < 6 or hour > 23:
+          min = datetime.datetime.now().minute
+          difference = 60 - crntMin
+          converted = difference * 60000
+          print("Hours is " + hour)
+          print("Sleeping ... waiting " + difference + " minutes")
+          sleep(converted)
+        # attempt to connect to the endpoint
+        while not(var):
+          try:
+              res = requests.get(URL)
+              var = True
+              # print("Connected")
+          except:
+              print("Failed to connect")
+
+        # creates a json object which is effectively a dictionary in python
+        openSections = res.json()
+        
+        mycursor.execute("SELECT * FROM Codes")
+        course_codes = mycursor.fetchall()
+        # iterates through each row in the TABLE Codes
+        for row in course_codes:
+          if str(row[2]) not in openSections:
+            continue
+          # sends the row tuple which is: (id, uid, codes)
+          uid = row[1]
+          mycursor.execute("SELECT netid FROM Users WHERE uid = %s", (uid,))
+          netid = mycursor.fetchone()
+          id = row[0]
+          codes = str(row[2])
+          map = updateDB.getCourseInfo(updateDB.getCourses())
+          courseName = map[codes]
+          yield f'SnipeRU: {netid}! {courseName}({codes}) opened!\n\n'
+          # notify.push(id, netid[0], courseName, codes)
+          if(datetime.datetime.now().month == endMonth):
+            break
+      # will cause thread to end
+      print(term + " thread has been closed")
+    
+    return Response(monitorThread("9", 17, finalURL), mimetype='text/event-stream')
 
 
 def buildMessage(id, netid, courseName, codes, URL, email):
