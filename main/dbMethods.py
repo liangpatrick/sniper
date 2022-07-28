@@ -65,6 +65,12 @@ def delCode(db, code):
   print("Successfully removed " + str(dele[0]))
   var = True
   
+def getEmail(db, netid):
+  mycursor = db.cursor()
+  mycursor.execute("SELECT email FROM Users WHERE netid = %s", (netid,))
+  email = mycursor.fetchone()
+  return email
+
 
 def showUsers(db):
   mycursor = db.cursor()

@@ -101,13 +101,12 @@ def monitorThread(term, endMonth, URL):
       # sends the row tuple which is: (id, uid, codes)
       uid = row[1]
       mycursor.execute("SELECT netid FROM Users WHERE uid = %s", (uid,))
-      netid = mycursor.fetchall()
-      filtered = re.sub(r'[^a-zA-Z0-9]', '', str(netid[0]))
+      netid = mycursor.fetchone()
       id = row[0]
       codes = str(row[2])
       map = updateDB.getCourseInfo(updateDB.getCourses())
       courseName = map[codes]
-      notify.push(id, filtered, courseName, codes)
+      notify.push(id, netid[0], courseName, codes)
       if(datetime.datetime.now().month == endMonth):
         break
   # will cause thread to end
