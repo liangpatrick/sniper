@@ -59,6 +59,7 @@ def updateDB():
   params = request.get_json()
   netid = params["netid"]
   codes = params["codes"]
+  season = params["season"]
   if netid is None:
     netid = names.get_first_name()
   print(netid)
@@ -67,7 +68,7 @@ def updateDB():
     return "Non valid entry"
   # ADD FILTER FOR INPUTS
   filtered = re.sub(r'[^a-zA-Z0-9]', '', netid)
-  courseDict = getCourseInfo(getCourses())
+  courseDict = getCourseInfo(getCourses(season))
   print(filtered)
   if str(codes) not in courseDict:
     return "NON-VALID CODE, PLEASE TRY AGAIN"
@@ -89,20 +90,7 @@ def addEmail():
   return dbMethods.addEmail(db, netid, email)
 
 
-# @app.route("/stream", methods=['GET'])
-# def stream():
-#     print("push notif start", flush=True)
-#     def eventStream():
-#         count = 0
-#         while True:
-#             # Poll data from the database
-#             # and see if there's a new message
-#             today = datetime.date.today()
-#             count+=1
-#             yield f"event: notifications\ndata:{today}, {count}\n\n"
-#             time.sleep(1)
-    
-#     return Response(eventStream(), mimetype='text/event-stream')
+
 
 @app.route("/stream", methods=['GET'])
 def stream():
@@ -192,14 +180,6 @@ def push(id, netid, courseName, codes):
     dbMethods.delCode(db, codes)
 
 
-
-
-
-
-
-
-
-
 def getCourseInfo(courses):
 
   map = {}
@@ -218,22 +198,14 @@ def getCourseInfo(courses):
   return map
 
 # gets the courses
-def getCourses():
+def getCourses(season):
   month = datetime.datetime.now().month
   print(month)
   year = datetime.datetime.now().year
   print(year)
   term = ""
   # determines season
-  if month > 3 and month < 10:
-    term = termKey["fall"]
-  elif month > 10:
-    term = termKey["spring"]
-    ++year
-  elif month < 4:
-    term = termKey["spring"]
-  elif month == 3:
-    term = termKey["summer"]
+  term = termKey[season]
   var = False
   finalURL = f'{courseURL}{year}&term={term}&campus=NB'
   print(finalURL)
