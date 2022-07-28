@@ -246,4 +246,4 @@ def getCourses():
   return res.json()
 
 if __name__ == "__main__":
-    app.run(host = "https://sniperu.herokuapp.com/")
+    app.run()
