@@ -93,14 +93,14 @@ def addEmail():
 def stream():
     print("push notif start", flush=True)
     def eventStream():
+        count = 0
         while True:
             # Poll data from the database
             # and see if there's a new message
             today = datetime.date.today()
-            print("push notif", flush=True)
-            print(today, flush=True)
-            yield f"event: notifications\ndata:{today}\n\n"
-            time.sleep(5)
+            count+=1
+            yield f"event: notifications\ndata:{today}, {count}\n\n"
+            time.sleep(1)
     
     return Response(eventStream(), mimetype='text/event-stream')
 
