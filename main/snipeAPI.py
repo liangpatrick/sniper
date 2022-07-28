@@ -146,7 +146,8 @@ def stream():
           netid = mycursor.fetchone()
           id = row[0]
           codes = str(row[2])
-          map = updateDB.getCourseInfo(updateDB.getCourses())
+          map = getCourseInfo(getCourses())
+          # map = updateDB.getCourseInfo(updateDB.getCourses())
           courseName = map[codes]
           yield f'SnipeRU: {netid}! {courseName}({codes}) opened!\n\n'
           # notify.push(id, netid[0], courseName, codes)
