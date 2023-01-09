@@ -39,14 +39,14 @@ def addEmail(db, netid, email):
 
   
 
-def addCode(db, code, netid):
+def addCode(db, code, netid, term):
   try:
       mycursor = db.cursor()
       mycursor.execute("SELECT uid FROM Users WHERE netid = %s", (netid,))
       uid = mycursor.fetchall()
-      Q =  "INSERT INTO Codes (codes, uid)\
-            VALUES (%s,%s)"
-      pair = (code, (uid[0],))
+      Q =  "INSERT INTO Codes (codes, uid, term)\
+            VALUES (%s,%s, %s)"
+      pair = (code, (uid[0],), term)
       mycursor.execute(Q, pair)
       db.commit()
   
